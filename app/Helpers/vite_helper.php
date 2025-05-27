@@ -1,131 +1,92 @@
 <?php
 
 /**
- * Helper Vite pour CodeIgniter 4 - Version Production Fixed
- * Corrige les problèmes CORS et chemins assets
+ * Helper Vite ULTRA-SIMPLE pour Production
+ * Évite tous les problèmes CORS en forçant les bons chemins
  */
 
 if (!function_exists('vite_assets')) {
-    /**
-     * Charge automatiquement tous les assets Vite (CSS + JS) pour une entrée donnée
-     * Version simplifiée pour production
-     */
     function vite_assets(string $jsEntry, array $jsAttributes = []): string
     {
-        $isDev = ENVIRONMENT === 'development' && is_vite_dev_server_running();
-        
-        if ($isDev) {
-            // Mode développement - Serveur Vite
-            $html = '<script type="module" src="http://localhost:5173/@vite/client"></script>' . PHP_EOL;
-            $html .= '<script type="module" src="http://localhost:5173/' . $jsEntry . '"></script>' . PHP_EOL;
-            return $html;
-        }
-        
-        // Mode production - Assets buildés
+        // FORCE: Toujours en mode production, jamais localhost
         $html = '';
         
-        // Chercher les assets dans public/assets/
-        $assetsPath = FCPATH . 'assets/';
-        $manifestPath = $assetsPath . '.vite/manifest.json';
+        // Chemin direct vers les assets
+        $assetsDir = FCPATH . 'assets/';
         
-        // Si pas de manifest, utiliser les noms de fichiers directs
-        if (!file_exists($manifestPath)) {
-            // Fallback: chercher les fichiers CSS et JS directement
-            $cssFiles = glob($assetsPath . '*.css');
-            $jsFiles = glob($assetsPath . '*.js');
-            
-            // CSS
-            foreach ($cssFiles as $cssFile) {
-                $filename = basename($cssFile);
-                $html .= '<link rel="stylesheet" href="' . base_url('assets/' . $filename) . '">' . PHP_EOL;
-            }
-            
-            // JS
-            foreach ($jsFiles as $jsFile) {
-                $filename = basename($jsFile);
-                $html .= '<script type="module" src="' . base_url('assets/' . $filename) . '"></script>' . PHP_EOL;
-            }
-            
-            return $html;
+        // 1. Chercher tous les CSS
+        $cssFiles = glob($assetsDir . '*.css') ?: [];
+        foreach ($cssFiles as $cssFile) {
+            $filename = basename($cssFile);
+            $html .= '<link rel="stylesheet" href="' . base_url('assets/' . $filename) . '">' . PHP_EOL;
         }
         
-        // Utiliser le manifest
-        $manifest = json_decode(file_get_contents($manifestPath), true);
+        // 2. Chercher dans le sous-dossier css/
+        $cssSubFiles = glob($assetsDir . 'css/*.css') ?: [];
+        foreach ($cssSubFiles as $cssFile) {
+            $filename = basename($cssFile);
+            $html .= '<link rel="stylesheet" href="' . base_url('assets/css/' . $filename) . '">' . PHP_EOL;
+        }
         
-        if (isset($manifest[$jsEntry])) {
-            $entry = $manifest[$jsEntry];
-            
-            // CSS
-            if (isset($entry['css'])) {
-                foreach ($entry['css'] as $cssFile) {
-                    $html .= '<link rel="stylesheet" href="' . base_url('assets/' . $cssFile) . '">' . PHP_EOL;
-                }
-            }
-            
-            // JS
-            $html .= '<script type="module" src="' . base_url('assets/' . $entry['file']) . '"></script>' . PHP_EOL;
+        // 3. Chercher tous les JS
+        $jsFiles = glob($assetsDir . '*.js') ?: [];
+        foreach ($jsFiles as $jsFile) {
+            $filename = basename($jsFile);
+            $html .= '<script type="module" src="' . base_url('assets/' . $filename) . '"></script>' . PHP_EOL;
+        }
+        
+        // 4. Chercher dans le sous-dossier js/
+        $jsSubFiles = glob($assetsDir . 'js/*.js') ?: [];
+        foreach ($jsSubFiles as $jsFile) {
+            $filename = basename($jsFile);
+            $html .= '<script type="module" src="' . base_url('assets/js/' . $filename) . '"></script>' . PHP_EOL;
         }
         
         return $html;
     }
 }
 
-if (!function_exists('is_vite_dev_server_running')) {
-    /**
-     * Vérifie si le serveur de développement Vite est accessible
-     */
-    function is_vite_dev_server_running(string $host = 'localhost', int $port = 5173): bool
+if (!function_exists('load_alpine_components')) {
+    function load_alpine_components(): string
     {
-        static $cache = null;
-        
-        if ($cache !== null) {
-            return $cache;
+        return '<script>
+// Alpine.js Components - Inline pour éviter CORS
+document.addEventListener("DOMContentLoaded", function() {
+    // Définir les composants globalement
+    window.darkMode = function() {
+        return {
+            isDark: localStorage.getItem("theme") === "dark" || 
+                   (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches),
+            toggle() {
+                this.isDark = !this.isDark;
+                localStorage.setItem("theme", this.isDark ? "dark" : "light");
+                document.documentElement.classList.toggle("dark", this.isDark);
+                console.log("✅ Dark mode:", this.isDark);
+            },
+            init() {
+                document.documentElement.classList.toggle("dark", this.isDark);
+                console.log("🌙 Dark mode initialized:", this.isDark);
+            }
         }
-
-        $context = stream_context_create([
-            'http' => [
-                'timeout' => 1,
-                'ignore_errors' => true,
-            ]
-        ]);
-        
-        $url = "http://{$host}:{$port}";
-        $cache = @file_get_contents($url, false, $context) !== false;
-        
-        return $cache;
-    }
-}
-
-if (!function_exists('load_alpine_fallback')) {
-    /**
-     * Charge Alpine.js en fallback si les assets principaux échouent
-     */
-    function load_alpine_fallback(): string
-    {
-        $html = '<!-- Alpine.js Fallback -->' . PHP_EOL;
-        $html .= '<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>' . PHP_EOL;
-        $html .= '<script>' . PHP_EOL;
-        $html .= 'window.darkMode = function() {' . PHP_EOL;
-        $html .= '    return {' . PHP_EOL;
-        $html .= '        isDark: localStorage.getItem("theme") === "dark",' . PHP_EOL;
-        $html .= '        toggle() {' . PHP_EOL;
-        $html .= '            this.isDark = !this.isDark;' . PHP_EOL;
-        $html .= '            localStorage.setItem("theme", this.isDark ? "dark" : "light");' . PHP_EOL;
-        $html .= '            document.documentElement.classList.toggle("dark", this.isDark);' . PHP_EOL;
-        $html .= '        },' . PHP_EOL;
-        $html .= '        init() {' . PHP_EOL;
-        $html .= '            document.documentElement.classList.toggle("dark", this.isDark);' . PHP_EOL;
-        $html .= '        }' . PHP_EOL;
-        $html .= '    }' . PHP_EOL;
-        $html .= '};' . PHP_EOL;
-        $html .= 'window.navbar = function() {' . PHP_EOL;
-        $html .= '    return {' . PHP_EOL;
-        $html .= '        isOpen: false,' . PHP_EOL;
-        $html .= '        toggle() { this.isOpen = !this.isOpen; }' . PHP_EOL;
-        $html .= '    }' . PHP_EOL;
-        $html .= '};' . PHP_EOL;
-        $html .= '</script>' . PHP_EOL;
-        
-        return $html;
+    };
+    
+    window.navbar = function() {
+        return {
+            isOpen: false,
+            toggle() {
+                this.isOpen = !this.isOpen;
+                console.log("📱 Navbar:", this.isOpen);
+            },
+            close() {
+                this.isOpen = false;
+                console.log("📱 Navbar closed");
+            }
+        }
+    };
+    
+    console.log("✅ Alpine.js components loaded");
+});
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>' . PHP_EOL;
     }
 }
