@@ -1,29 +1,34 @@
 import { defineConfig } from 'vite';
+import { resolve } from 'path';
 
 export default defineConfig({
-  // Assets statiques
+  // Configuration des assets statiques
   publicDir: 'resources/static',
   
-  css: {
-    devSourcemap: true,
-    postcss: './postcss.config.js',
-  },
-  
+  // Configuration du build
   build: {
     outDir: 'public/assets',
     emptyOutDir: true,
     manifest: true,
-    assetsInlineLimit: 0,
+    
+    // Optimisations de performance
+    cssCodeSplit: false, // Un seul fichier CSS pour éviter FOUC
+    assetsInlineLimit: 0, // Pas d'inline pour un contrôle total
     
     rollupOptions: {
       input: {
-        app: 'resources/js/app.js',
+        // Point d'entrée principal (CSS importé dans JS)
+        main: resolve(__dirname, 'resources/js/app.js'),
       },
       output: {
-        entryFileNames: '[name].[hash].js',
-        chunkFileNames: '[name].[hash].js',
+        // Structure de fichiers optimisée
+        entryFileNames: 'js/[name].[hash].js',
+        chunkFileNames: 'js/chunks/[name].[hash].js',
         assetFileNames: (assetInfo) => {
-          const ext = assetInfo.name.split('.').pop();
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          
+          // Organisation par type de fichier
           if (/css/.test(ext)) {
             return 'css/[name].[hash][extname]';
           }
@@ -33,27 +38,86 @@ export default defineConfig({
           if (/\.(woff2?|eot|ttf|otf)$/i.test(assetInfo.name)) {
             return 'fonts/[name].[hash][extname]';
           }
-          return '[name].[hash][extname]';
-        }
-      }
+          if (/\.(mp4|webm|ogg|mp3|wav|flac|aac)$/i.test(assetInfo.name)) {
+            return 'media/[name].[hash][extname]';
+          }
+          return 'assets/[name].[hash][extname]';
+        },
+        
+        // Optimisation des chunks
+        manualChunks: {
+          // Séparer les vendors pour un meilleur cache
+          vendor: ['alpinejs'],
+        },
+      },
     },
     
+    // Configuration du sourcemap
     sourcemap: process.env.NODE_ENV === 'development',
+    
+    // Optimisations build
     minify: 'esbuild',
     target: 'es2020',
     reportCompressedSize: true,
+    
+    // Cache busting pour les assets
+    assetsDir: '',
   },
   
+  // Configuration CSS
+  css: {
+    devSourcemap: true,
+    postcss: './postcss.config.js',
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "./resources/css/variables.scss";`,
+      },
+    },
+  },
+  
+  // Configuration du serveur de développement
   server: {
+    host: 'localhost',
+    port: 5173,
+    strictPort: true,
     hmr: {
       host: 'localhost',
+      port: 5173,
     },
     watch: {
-      include: ['app/Views/**/*.php'],
+      // Surveiller les changements dans les templates CI4
+      include: [
+        'app/Views/**/*.php',
+        'resources/**/*',
+      ],
+      ignored: ['**/node_modules/**', '**/vendor/**'],
+    },
+    cors: true,
+  },
+  
+  // Optimisation des dépendances
+  optimizeDeps: {
+    include: ['alpinejs'],
+    exclude: [],
+  },
+  
+  // Configuration de résolution
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'resources'),
+      '@css': resolve(__dirname, 'resources/css'),
+      '@js': resolve(__dirname, 'resources/js'),
+      '@images': resolve(__dirname, 'resources/static/images'),
+      '@fonts': resolve(__dirname, 'resources/static/fonts'),
     },
   },
   
-  optimizeDeps: {
-    include: ['alpinejs'],
+  // Variables d'environnement
+  define: {
+    __DEV__: process.env.NODE_ENV === 'development',
+    __PROD__: process.env.NODE_ENV === 'production',
   },
+  
+  // Configuration des plugins (si nécessaire)
+  plugins: [],
 });

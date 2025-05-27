@@ -1,42 +1,143 @@
+/* CI4 Tailwind Template - Main Stylesheet */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Classes utilitaires personnalisées */
-@layer utilities {
+/* Base components */
+@layer components {
+  /* Layout containers */
   .container-custom {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
   
-  .glass {
-    @apply bg-white/80 dark:bg-secondary-900/80 backdrop-blur-md border border-white/20 dark:border-secondary-700/50;
+  .section {
+    @apply py-16 lg:py-24;
   }
   
-  .bg-gradient-primary {
-    @apply bg-gradient-to-r from-primary-600 to-primary-700;
+  .section-sm {
+    @apply py-12 lg:py-16;
   }
   
-  .btn-primary {
-    @apply inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   
   .btn-sm {
-    @apply px-3 py-1.5 text-sm;
+    @apply px-4 py-2 text-sm;
   }
   
+  .btn-lg {
+    @apply px-8 py-4 text-lg;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-md hover:shadow-lg;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary-200 text-secondary-900 hover:bg-secondary-300 focus:ring-secondary-400 dark:bg-secondary-700 dark:text-white dark:hover:bg-secondary-600;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white focus:ring-primary-500;
+  }
+  
+  /* Form elements */
+  .input {
+    @apply block w-full px-4 py-3 text-base border border-secondary-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 dark:bg-secondary-800 dark:border-secondary-600 dark:text-white;
+  }
+  
+  .input:invalid {
+    @apply border-red-500 focus:ring-red-500;
+  }
+  
+  /* Navigation */
   .nav-link {
-    @apply text-secondary-600 dark:text-secondary-400 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors duration-200;
+    @apply text-secondary-700 dark:text-secondary-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors duration-200 relative;
   }
   
   .nav-link.active {
     @apply text-primary-600 dark:text-primary-400;
   }
   
+  .nav-link.active::after {
+    @apply absolute -bottom-1 left-0 w-full h-0.5 bg-primary-600 dark:bg-primary-400;
+    content: '';
+  }
+  
   .nav-link-mobile {
-    @apply block px-4 py-3 text-secondary-700 dark:text-secondary-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-secondary-50 dark:hover:bg-secondary-800 rounded-lg transition-colors duration-200;
+    @apply text-secondary-700 dark:text-secondary-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
   
   .nav-link-mobile.active {
-    @apply text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30;
+    @apply bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300;
+  }
+  
+  /* Glass effect for navbar */
+  .glass {
+    @apply backdrop-blur-md bg-white/80 dark:bg-secondary-900/80;
+  }
+  
+  /* Gradients */
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, theme('colors.primary.600'), theme('colors.primary.700'));
+  }
+  
+  .bg-gradient-secondary {
+    background: linear-gradient(135deg, theme('colors.secondary.100'), theme('colors.secondary.200'));
+  }
+  
+  /* Cards */
+  .card {
+    @apply bg-white dark:bg-secondary-800 rounded-xl shadow-md border border-secondary-200 dark:border-secondary-700 transition-all duration-300;
+  }
+  
+  .card-hover {
+    @apply hover:shadow-xl hover:-translate-y-1;
+  }
+  
+  /* Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-bounce-gentle {
+    animation: bounceGentle 2s infinite;
+  }
+}
+
+/* Utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-after: always;
+  }
+  
+  body {
+    @apply text-black bg-white;
   }
 }

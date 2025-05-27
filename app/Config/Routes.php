@@ -26,4 +26,14 @@ $routes->get('contact', 'Contact::index');
 // Language switcher
 $routes->get('language/(:segment)', 'Home::language/$1');
 
+// Test routes (development only)
+if (ENVIRONMENT === 'development') {
+    $routes->group('test', function($routes) {
+        $routes->get('', 'Test::index');
+        $routes->get('performance', 'Test::performance');
+        $routes->get('vite_status', 'Test::vite_status');
+        $routes->get('vite_dev', 'Test::vite_dev');
+    });
+}
+
 $routes->get('(:any)', 'Pages::view/$1');

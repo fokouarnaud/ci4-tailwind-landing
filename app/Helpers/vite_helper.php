@@ -1,356 +1,295 @@
 <?php
 
 /**
- * Vite Helper Functions - Version 4.0 compatible
+ * Helper Vite pour CodeIgniter 4
+ * Intégration optimisée avec manifest.json et support dev/prod
  * 
- * Helper optimisé pour Tailwind CSS v4 et Vite 5+
- * avec support amélioré du nouveau plugin @tailwindcss/vite
- * 
- * Version 4.0 - Compatible avec Tailwind CSS v4
+ * @version 2.0
+ * @author IT-Innov
  */
 
-if (! function_exists('vite_asset')) {
+if (!function_exists('vite_asset')) {
     /**
-     * Obtient l'URL d'un asset Vite depuis le manifest
+     * Génère l'URL d'un asset Vite en utilisant le manifest.json
      * 
      * @param string $entry Point d'entrée (ex: 'resources/js/app.js')
-     * @return string URL de l'asset ou chaîne vide si non trouvé
+     * @param bool|null $isDev Mode développement (auto-détecté si null)
+     * @return string URL de l'asset
      */
-    function vite_asset(string $entry): string
+    function vite_asset(string $entry, ?bool $isDev = null): string
     {
-        static $manifest = null;
-        
-        // Charger le manifest une seule fois
-        if ($manifest === null) {
-            $manifestPath = FCPATH . 'assets/.vite/manifest.json';
-            
-            if (!file_exists($manifestPath)) {
-                if (ENVIRONMENT === 'development') {
-                    log_message('info', 'Vite manifest not found. Run "npm run build" to generate assets.');
-                }
-                return '';
-            }
-            
-            $manifestContent = file_get_contents($manifestPath);
-            $manifest = json_decode($manifestContent, true);
-            
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                log_message('error', 'Invalid Vite manifest JSON: ' . json_last_error_msg());
-                return '';
-            }
+        // Auto-détection du mode développement
+        if ($isDev === null) {
+            $isDev = ENVIRONMENT === 'development' && is_vite_dev_server_running();
         }
-        
-        // Chercher l'entrée dans le manifest
-        if (!isset($manifest[$entry])) {
-            log_message('warning', "Vite asset not found in manifest: {$entry}");
-            return '';
-        }
-        
-        $asset = $manifest[$entry];
-        return base_url('assets/' . $asset['file']);
-    }
-}
 
-if (! function_exists('vite_css')) {
-    /**
-     * Obtient l'URL du fichier CSS associé à une entrée Vite
-     * Version optimisée pour Tailwind CSS v4
-     * 
-     * @param string $entry Point d'entrée (ex: 'resources/js/app.js')
-     * @return string URL du CSS ou chaîne vide si non trouvé
-     */
-    function vite_css(string $entry): string
-    {
-        static $manifest = null;
+        // En mode développement, utiliser le serveur Vite
+        if ($isDev) {
+            return "http://localhost:5173/{$entry}";
+        }
+
+        // En production, utiliser le manifest.json
+        $manifestPath = FCPATH . 'assets/.vite/manifest.json';
         
-        if ($manifest === null) {
-            $manifestPath = FCPATH . 'assets/.vite/manifest.json';
-            
-            if (!file_exists($manifestPath)) {
-                return '';
-            }
-            
-            $manifestContent = file_get_contents($manifestPath);
-            $manifest = json_decode($manifestContent, true);
-            
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return '';
-            }
+        if (!file_exists($manifestPath)) {
+            throw new RuntimeException("Manifest Vite introuvable : {$manifestPath}. Exécutez 'npm run build'");
+        }
+
+        $manifest = json_decode(file_get_contents($manifestPath), true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new RuntimeException("Erreur de parsing du manifest Vite : " . json_last_error_msg());
         }
         
         if (!isset($manifest[$entry])) {
-            return '';
+            throw new RuntimeException("Entrée '{$entry}' introuvable dans le manifest Vite. Entrées disponibles : " . implode(', ', array_keys($manifest)));
         }
-        
-        $asset = $manifest[$entry];
-        
-        // ✅ Tailwind v4 génère le CSS dans la propriété 'css' (array)
-        if (isset($asset['css']) && !empty($asset['css']) && is_array($asset['css'])) {
-            return base_url('assets/' . $asset['css'][0]);
-        }
-        
-        // ✅ Cas où le CSS est une chaîne simple
-        if (isset($asset['css']) && is_string($asset['css'])) {
-            return base_url('assets/' . $asset['css']);
-        }
-        
-        // ✅ Chercher tous les fichiers CSS dans le manifest
-        foreach ($manifest as $manifestAsset) {
-            if (isset($manifestAsset['file']) && str_ends_with($manifestAsset['file'], '.css')) {
-                return base_url('assets/' . $manifestAsset['file']);
-            }
-        }
-        
-        return '';
+
+        return base_url('assets/' . $manifest[$entry]['file']);
     }
 }
 
-if (! function_exists('vite_all_css')) {
+if (!function_exists('vite_css_assets')) {
     /**
-     * Obtient tous les fichiers CSS du manifest
-     * Utile pour Tailwind CSS v4 qui peut générer plusieurs fichiers CSS
+     * Récupère tous les fichiers CSS associés à une entrée
      * 
-     * @return array URLs de tous les fichiers CSS
+     * @param string $entry Point d'entrée
+     * @param bool|null $isDev Mode développement
+     * @return array Liste des URLs CSS
      */
-    function vite_all_css(): array
+    function vite_css_assets(string $entry, ?bool $isDev = null): array
     {
-        static $manifest = null;
-        
-        if ($manifest === null) {
-            $manifestPath = FCPATH . 'assets/.vite/manifest.json';
-            
-            if (!file_exists($manifestPath)) {
-                return [];
-            }
-            
-            $manifestContent = file_get_contents($manifestPath);
-            $manifest = json_decode($manifestContent, true);
-            
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return [];
-            }
+        // Auto-détection du mode développement
+        if ($isDev === null) {
+            $isDev = ENVIRONMENT === 'development' && is_vite_dev_server_running();
         }
+
+        // En mode développement, le CSS est injecté par Vite
+        if ($isDev) {
+            return [];
+        }
+
+        $manifestPath = FCPATH . 'assets/.vite/manifest.json';
         
+        if (!file_exists($manifestPath)) {
+            return [];
+        }
+
+        $manifest = json_decode(file_get_contents($manifestPath), true);
         $cssFiles = [];
-        foreach ($manifest as $asset) {
-            if (isset($asset['file']) && str_ends_with($asset['file'], '.css')) {
+
+        // CSS associés à l'entrée principale
+        if (isset($manifest[$entry]['css'])) {
+            foreach ($manifest[$entry]['css'] as $cssFile) {
+                $cssFiles[] = base_url('assets/' . $cssFile);
+            }
+        }
+
+        // Rechercher les entrées CSS séparées
+        foreach ($manifest as $key => $asset) {
+            if (str_ends_with($key, '.css') || (isset($asset['src']) && str_ends_with($asset['src'], '.css'))) {
                 $cssFiles[] = base_url('assets/' . $asset['file']);
             }
-            
-            // Vérifier aussi dans la propriété css
-            if (isset($asset['css']) && is_array($asset['css'])) {
-                foreach ($asset['css'] as $cssFile) {
-                    $cssFiles[] = base_url('assets/' . $cssFile);
-                }
-            }
         }
-        
+
         return array_unique($cssFiles);
     }
 }
 
-if (! function_exists('vite_tags')) {
+if (!function_exists('vite_css')) {
     /**
-     * Génère les tags HTML pour charger les assets Vite
-     * Version optimisée pour Tailwind CSS v4
+     * Génère les balises <link> pour les assets CSS Vite
      * 
-     * @param string $entry Point d'entrée (ex: 'resources/js/app.js')
-     * @return string HTML tags pour CSS et JS
+     * @param string $entry Point d'entrée CSS
+     * @param bool|null $isDev Mode développement
+     * @return string Balises HTML <link>
      */
-    function vite_tags(string $entry): string
+    function vite_css(string $entry, ?bool $isDev = null): string
     {
-        $output = '';
+        $cssAssets = vite_css_assets($entry, $isDev);
         
-        // ✅ CSS tags - optimisé pour Tailwind v4
-        $cssUrl = vite_css($entry);
-        if (!empty($cssUrl)) {
-            $output .= '<link rel="stylesheet" href="' . $cssUrl . '">' . "\n";
-        } else {
-            // Fallback: charger tous les CSS si aucun spécifique trouvé
-            $allCss = vite_all_css();
-            foreach ($allCss as $cssUrl) {
-                $output .= '<link rel="stylesheet" href="' . $cssUrl . '">' . "\n";
-            }
+        if (empty($cssAssets)) {
+            return '';
         }
-        
-        // ✅ JS tag avec support module
-        $jsUrl = vite_asset($entry);
-        if (!empty($jsUrl)) {
-            $output .= '<script type="module" src="' . $jsUrl . '"></script>' . "\n";
+
+        $links = '';
+        foreach ($cssAssets as $cssUrl) {
+            $links .= '<link rel="stylesheet" href="' . $cssUrl . '">' . PHP_EOL;
         }
-        
-        return $output;
+
+        return $links;
     }
 }
 
-if (! function_exists('vite_dev_server')) {
+if (!function_exists('vite_js')) {
     /**
-     * Vérifie si le serveur de développement Vite est actif
-     * Version optimisée avec cache statique
+     * Génère les balises <script> pour les assets JS Vite
      * 
-     * @return bool
+     * @param string $entry Point d'entrée JS
+     * @param bool|null $isDev Mode développement
+     * @param array $attributes Attributs supplémentaires pour la balise script
+     * @return string Balises HTML <script>
      */
-    function vite_dev_server(): bool
+    function vite_js(string $entry, ?bool $isDev = null, array $attributes = []): string
     {
-        if (ENVIRONMENT !== 'development') {
-            return false;
+        // Auto-détection du mode développement
+        if ($isDev === null) {
+            $isDev = ENVIRONMENT === 'development' && is_vite_dev_server_running();
         }
-        
-        // Cache du résultat pour éviter les appels répétés
-        static $isRunning = null;
-        if ($isRunning !== null) {
-            return $isRunning;
+
+        // Préparer les attributs
+        $attrs = '';
+        foreach ($attributes as $key => $value) {
+            $attrs .= ' ' . $key . '="' . htmlspecialchars($value) . '"';
         }
+
+        // En mode développement
+        if ($isDev) {
+            $html = '';
+            
+            // Client Vite pour HMR
+            $html .= '<script type="module" src="http://localhost:5173/@vite/client"></script>' . PHP_EOL;
+            
+            // Script principal
+            $html .= '<script type="module" src="http://localhost:5173/' . $entry . '"' . $attrs . '></script>' . PHP_EOL;
+            
+            return $html;
+        }
+
+        // En production
+        try {
+            $assetUrl = vite_asset($entry, false);
+            return '<script type="module" src="' . $assetUrl . '"' . $attrs . '></script>' . PHP_EOL;
+        } catch (RuntimeException $e) {
+            // En cas d'erreur, afficher un commentaire de debug
+            return "<!-- Erreur Vite: {$e->getMessage()} -->" . PHP_EOL;
+        }
+    }
+}
+
+if (!function_exists('vite_assets')) {
+    /**
+     * Charge automatiquement tous les assets Vite (CSS + JS) pour une entrée donnée
+     * 
+     * @param string $jsEntry Point d'entrée JavaScript principal (qui importe le CSS)
+     * @param array $jsAttributes Attributs pour les balises script
+     * @return string HTML complet (CSS + JS)
+     */
+    function vite_assets(string $jsEntry, array $jsAttributes = []): string
+    {
+        $isDev = ENVIRONMENT === 'development' && is_vite_dev_server_running();
         
-        // Essayer de se connecter au serveur Vite (localhost:5173)
+        $html = '';
+        
+        // CSS Assets (extraits automatiquement du JS par Vite)
+        $html .= vite_css($jsEntry, $isDev);
+        
+        // JavaScript Assets
+        $html .= vite_js($jsEntry, $isDev, $jsAttributes);
+        
+        return $html;
+    }
+}
+
+if (!function_exists('is_vite_dev_server_running')) {
+    /**
+     * Vérifie si le serveur de développement Vite est en cours d'exécution
+     * 
+     * @param string $host Host du serveur Vite
+     * @param int $port Port du serveur Vite
+     * @return bool True si le serveur Vite est accessible
+     */
+    function is_vite_dev_server_running(string $host = 'localhost', int $port = 5173): bool
+    {
+        static $cache = null;
+        
+        // Cache le résultat pour éviter les appels multiples
+        if ($cache !== null) {
+            return $cache;
+        }
+
         $context = stream_context_create([
             'http' => [
                 'timeout' => 1,
                 'ignore_errors' => true,
+                'method' => 'HEAD'
             ]
         ]);
         
-        $result = @file_get_contents('http://localhost:5173/@vite/client', false, $context);
-        $isRunning = ($result !== false);
+        $url = "http://{$host}:{$port}/@vite/client";
+        $cache = @file_get_contents($url, false, $context) !== false;
         
-        return $isRunning;
+        return $cache;
     }
 }
 
-if (! function_exists('vite_dev_tags')) {
+if (!function_exists('vite_manifest_info')) {
     /**
-     * Génère les tags pour le mode développement Vite
-     * Compatible avec le plugin @tailwindcss/vite
+     * Retourne les informations du manifest Vite pour debug
      * 
-     * @param string $entry Point d'entrée (ex: 'resources/js/app.js')
-     * @return string HTML tags pour le dev server
+     * @return array|null Contenu du manifest ou null si non trouvé
      */
-    function vite_dev_tags(string $entry): string
-    {
-        if (!vite_dev_server()) {
-            return '';
-        }
-        
-        $output = '';
-        
-        // ✅ Vite client script pour HMR
-        $output .= '<script type="module" src="http://localhost:5173/@vite/client"></script>' . "\n";
-        
-        // ✅ Entry point script - Tailwind v4 sera traité automatiquement
-        $output .= '<script type="module" src="http://localhost:5173/' . $entry . '"></script>' . "\n";
-        
-        return $output;
-    }
-}
-
-if (! function_exists('vite')) {
-    /**
-     * Point d'entrée principal pour charger les assets Vite
-     * Compatible avec Tailwind CSS v4 et le plugin @tailwindcss/vite
-     * 
-     * @param string $entry Point d'entrée (ex: 'resources/js/app.js')
-     * @param bool $debug Afficher les infos de debug
-     * @return string HTML tags appropriés
-     */
-    function vite(string $entry = 'resources/js/app.js', bool $debug = false): string
-    {
-        $output = '';
-        
-        // Debug info pour le développement
-        if ($debug && ENVIRONMENT === 'development') {
-            $output .= "<!-- Vite v4 Debug: Entry = {$entry} -->\n";
-            $output .= "<!-- Vite v4 Debug: Environment = " . ENVIRONMENT . " -->\n";
-            $output .= "<!-- Vite v4 Debug: Dev Server = " . (vite_dev_server() ? 'Active' : 'Inactive') . " -->\n";
-            $output .= "<!-- Vite v4 Debug: Tailwind CSS v4 Ready -->\n";
-        }
-        
-        // En développement avec serveur Vite actif
-        if (ENVIRONMENT === 'development' && vite_dev_server()) {
-            $output .= vite_dev_tags($entry);
-        } else {
-            // En production ou si le dev server n'est pas disponible
-            $output .= vite_tags($entry);
-        }
-        
-        return $output;
-    }
-}
-
-if (! function_exists('vite_manifest_debug')) {
-    /**
-     * Fonction de debug pour afficher le contenu du manifest
-     * Utile pour diagnostiquer les problèmes de build Tailwind v4
-     * 
-     * @return string Contenu formaté du manifest
-     */
-    function vite_manifest_debug(): string
+    function vite_manifest_info(): ?array
     {
         $manifestPath = FCPATH . 'assets/.vite/manifest.json';
         
         if (!file_exists($manifestPath)) {
-            return "❌ Manifest not found at: {$manifestPath}";
+            return null;
         }
-        
-        $manifestContent = file_get_contents($manifestPath);
-        $manifest = json_decode($manifestContent, true);
+
+        $manifest = json_decode(file_get_contents($manifestPath), true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return "❌ Invalid manifest JSON: " . json_last_error_msg();
+            return null;
         }
-        
-        $output = "✅ Manifest loaded successfully:\n";
-        $output .= "📁 Path: {$manifestPath}\n";
-        $output .= "📄 Content:\n";
-        $output .= json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        
-        return $output;
+
+        return $manifest;
     }
 }
 
-if (! function_exists('vite_v4_health_check')) {
+if (!function_exists('vite_preload_assets')) {
     /**
-     * Vérification de santé pour Tailwind CSS v4 et Vite
+     * Génère les balises de preload pour les assets critiques
      * 
-     * @return array Résultats de la vérification
+     * @param array $entries Entrées à preloader
+     * @return string Balises de preload
      */
-    function vite_v4_health_check(): array
+    function vite_preload_assets(array $entries): string
     {
-        $results = [
-            'manifest_exists' => false,
-            'dev_server_running' => false,
-            'css_files_found' => 0,
-            'js_files_found' => 0,
-            'tailwind_v4_ready' => false,
-        ];
+        $isDev = ENVIRONMENT === 'development' && is_vite_dev_server_running();
         
-        // Vérifier le manifest
-        $manifestPath = FCPATH . 'assets/.vite/manifest.json';
-        $results['manifest_exists'] = file_exists($manifestPath);
+        // Pas de preload en développement
+        if ($isDev) {
+            return '';
+        }
+
+        $html = '';
+        $manifest = vite_manifest_info();
         
-        if ($results['manifest_exists']) {
-            $manifestContent = file_get_contents($manifestPath);
-            $manifest = json_decode($manifestContent, true);
-            
-            if (json_last_error() === JSON_ERROR_NONE) {
-                foreach ($manifest as $asset) {
-                    if (isset($asset['file'])) {
-                        if (str_ends_with($asset['file'], '.css')) {
-                            $results['css_files_found']++;
-                        }
-                        if (str_ends_with($asset['file'], '.js')) {
-                            $results['js_files_found']++;
-                        }
-                    }
+        if (!$manifest) {
+            return '';
+        }
+
+        foreach ($entries as $entry) {
+            if (isset($manifest[$entry])) {
+                $asset = $manifest[$entry];
+                $url = base_url('assets/' . $asset['file']);
+                
+                // Preload JS
+                if (str_ends_with($asset['file'], '.js')) {
+                    $html .= '<link rel="modulepreload" href="' . $url . '">' . PHP_EOL;
                 }
                 
-                // Tailwind v4 est prêt si on a du CSS généré
-                $results['tailwind_v4_ready'] = $results['css_files_found'] > 0;
+                // Preload CSS
+                if (isset($asset['css'])) {
+                    foreach ($asset['css'] as $cssFile) {
+                        $cssUrl = base_url('assets/' . $cssFile);
+                        $html .= '<link rel="preload" href="' . $cssUrl . '" as="style">' . PHP_EOL;
+                    }
+                }
             }
         }
-        
-        // Vérifier le serveur de développement
-        $results['dev_server_running'] = vite_dev_server();
-        
-        return $results;
+
+        return $html;
     }
 }
