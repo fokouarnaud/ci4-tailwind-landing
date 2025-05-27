@@ -1,0 +1,116 @@
+# Render.com Infrastructure as Code - CI4 + Tailwind Template
+# Documentation: https://render.com/docs/yaml-spec
+
+services:
+  # Web Service - CodeIgniter 4 Application
+  - type: web
+    name: ci4-tailwind-template
+    runtime: php
+    plan: free
+    region: oregon  # Changez selon votre localisation
+    
+    # Repository Configuration
+    repo: https://github.com/YOUR_USERNAME/YOUR_REPO.git  # À modifier
+    branch: main
+    rootDir: .
+    
+    # Build Configuration
+    buildCommand: |
+      echo "🔧 Installing PHP dependencies..."
+      composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+      echo "📦 Installing Node.js dependencies..."
+      npm ci --only=production
+      echo "🏗️ Building production assets..."
+      npm run build:prod || npm run build
+      echo "🧹 Cleaning up..."
+      rm -rf node_modules/.cache
+      echo "✅ Build completed successfully"
+    
+    # Runtime Configuration  
+    startCommand: |
+      echo "🚀 Starting CI4 + Tailwind application..."
+      vendor/bin/heroku-php-apache2 -C apache.conf public/
+    
+    # Environment Variables
+    envVars:
+      - key: CI_ENVIRONMENT
+        value: production
+      - key: COMPOSER_ALLOW_SUPERUSER
+        value: "1"
+      - key: COMPOSER_MEMORY_LIMIT
+        value: "-1"
+      - key: NODE_ENV
+        value: production
+      - key: APP_ENV
+        value: production
+      # Add your custom environment variables here:
+      # - key: DATABASE_URL
+      #   value: postgresql://user:pass@host:5432/db
+      # - key: EMAIL_HOST
+      #   value: smtp.resend.com
+      # - key: EMAIL_PASSWORD
+      #   fromSecret: RESEND_API_KEY
+    
+    # Deployment Configuration
+    autoDeploy: true
+    
+    # Health Check
+    healthCheckPath: /
+    
+    # Custom Domains (uncomment and configure if needed)
+    # domains:
+    #   - yourdomain.com
+    #   - www.yourdomain.com
+    
+    # Scaling (for paid plans)
+    # scaling:
+    #   minInstances: 1
+    #   maxInstances: 3
+    
+    # Build Filters (optional - trigger builds only for specific file changes)
+    # buildFilter:
+    #   paths:
+    #     - app/**
+    #     - public/**
+    #     - resources/**
+    #     - composer.json
+    #     - package.json
+    #   ignoredPaths:
+    #     - README.md
+    #     - documentation/**
+
+# Optional: Database Service (uncomment if you want Render PostgreSQL instead of Supabase)
+# databases:
+#   - name: ci4-database
+#     databaseName: ci4_production
+#     user: ci4_user
+#     plan: free  # 1GB free tier
+#     postgresMajorVersion: 15
+
+# Optional: Redis Cache (for advanced caching)
+# - type: redis
+#   name: ci4-cache
+#   plan: free  # 25MB free tier
+#   maxmemoryPolicy: allkeys-lru
+
+# Optional: Background Workers (for queue processing)
+# - type: worker
+#   name: ci4-worker
+#   runtime: php
+#   buildCommand: composer install --no-dev --optimize-autoloader
+#   startCommand: php spark queue:work
+#   envVarsFrom:
+#     - service: ci4-tailwind-template
+#   scaling:
+#     minInstances: 0
+#     maxInstances: 1
+
+# Optional: Cron Jobs (for scheduled tasks)
+# - type: cron
+#   name: ci4-scheduler
+#   runtime: php
+#   schedule: "0 2 * * *"  # Daily at 2 AM
+#   buildCommand: composer install --no-dev --optimize-autoloader
+#   startCommand: php spark task:daily
+#   envVarsFrom:
+#     - service: ci4-tailwind-template
