@@ -1,181 +1,176 @@
 # 🚀 CI4 Tailwind Template v2.0
-## Production-Ready avec Déploiement Railway
+## Production-Ready with Render.com Deployment
 
-Template CodeIgniter 4 moderne avec Tailwind CSS, Vite, Alpine.js et configuration Docker optimisée pour Railway.
+Modern CodeIgniter 4 template with Tailwind CSS, Vite, Alpine.js, and optimized Render.com configuration for professional deployments.
 
 ![CI4](https://img.shields.io/badge/CodeIgniter-4.6+-red?style=flat-square)
 ![Tailwind](https://img.shields.io/badge/Tailwind-v3.4-blue?style=flat-square)
 ![Vite](https://img.shields.io/badge/Vite-5.0-yellow?style=flat-square)
-![Railway](https://img.shields.io/badge/Railway-Ready-purple?style=flat-square)
-![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=flat-square)
+![Render](https://img.shields.io/badge/Render-Ready-purple?style=flat-square)
+![PHP](https://img.shields.io/badge/PHP-8.1+-blue?style=flat-square)
 
-## ✨ **Nouveautés v2.0**
+## ✨ **Features v2.0**
 
-- 🐳 **Docker optimisé** pour Railway/Production
-- 🚀 **Déploiement 1-click** via Railway
-- 🔒 **Headers sécurisé** et optimisations performance
-- 📊 **Monitoring intégré** et health checks
-- 📧 **Email ready** (Resend/EmailJS)
-- 🗄️ **Database ready** (Supabase/PostgreSQL)
+- 🚀 **Render.com optimized** - Native PHP deployment
+- 📝 **Infrastructure as Code** - render.yaml configuration
+- 🔒 **Security headers** - Production-ready Apache config
+- 📊 **Performance optimized** - Compression, caching, CDN
+- 📧 **Email ready** - Resend/SMTP integration
+- 🗄️ **Database ready** - Supabase/PostgreSQL support
 
-## 🛠️ **Stack Technique**
+## 🛠️ **Tech Stack**
 
 ### **Backend**
-- **CodeIgniter 4.6+** - Framework PHP moderne
-- **PHP 8.1+** - Performance et features modernes
-- **Apache 2.4** - Serveur web optimisé
+- **CodeIgniter 4.6+** - Modern PHP framework
+- **PHP 8.1+** - Latest performance and features
+- **Apache 2.4** - Optimized web server config
 
 ### **Frontend**
-- **Tailwind CSS v3.4.1** - Framework CSS utility-first
-- **Vite 5** - Build tool ultra-rapide avec HMR
-- **Alpine.js 3.13** - Framework JS réactif léger
-- **PostCSS** - Traitement CSS avancé
+- **Tailwind CSS v3.4.1** - Utility-first CSS framework
+- **Vite 5** - Lightning-fast build tool with HMR
+- **Alpine.js 3.13** - Lightweight reactive framework
+- **PostCSS** - Advanced CSS processing
 
 ### **Infrastructure**
-- **Docker** - Containerisation production-ready
-- **Railway** - Platform-as-a-Service simple
-- **PostgreSQL** - Base de données (via Supabase)
-- **Redis** - Cache haute performance (optionnel)
+- **Render.com** - Simple Platform-as-a-Service
+- **PostgreSQL** - Robust database (via Supabase)
+- **Apache** - Optimized configuration included
+- **SSL** - Automatic Let's Encrypt certificates
 
-## 🚀 **Installation Locale**
+## 🚀 **Local Installation**
 
-### **Prérequis**
-- PHP 8.1+ avec extensions : `pdo`, `mbstring`, `intl`, `curl`
-- Node.js 18+ et npm
+### **Prerequisites**
+- PHP 8.1+ with extensions: `pdo`, `mbstring`, `intl`, `curl`
+- Node.js 18+ and npm
 - Composer 2.0+
 - Git
 
-### **Setup Rapide**
+### **Quick Setup**
 ```bash
-# Cloner le repository
+# Clone the repository
 git clone https://github.com/your-repo/ci4-tailwind-template.git
 cd ci4-tailwind-template
 
-# Installation des dépendances
+# Install dependencies
 composer install
 npm install
 
-# Configuration environnement
+# Environment configuration
 cp .env.example .env
 
-# Build des assets
+# Build production assets
 npm run build:prod
 
-# Démarrage local
+# Start development
 npm run start
 ```
 
-## 🌐 **Déploiement Railway (5 minutes)**
+## 🌐 **Render.com Deployment (5 minutes)**
 
-### **Méthode Recommandée**
+### **Method 1: Infrastructure as Code (Recommended)**
 
-1. **Fork ce repository** sur GitHub
+1. **Fork this repository** on GitHub
 
-2. **Validation pré-déploiement**
+2. **Validate configuration**
    ```bash
-   # Teste tout avant déploiement
-   validate-deploy.bat
+   # Test everything before deploy
+   ./setup-render-yaml.bat
    ```
 
-3. **Déploiement Railway**
-   - Aller sur [railway.app](https://railway.app)
-   - "New Project" → "Deploy from GitHub repo"
-   - Sélectionner votre fork
-   - Railway détecte automatiquement le Dockerfile ✅
+3. **Deploy to Render**
+   - Go to [render.com](https://render.com)
+   - "New Web Service" → "Connect GitHub repo"
+   - Select your repository
+   - Render auto-detects `render.yaml` ✅
 
-4. **Configuration variables** (Railway Dashboard)
-   ```env
-   CI_ENVIRONMENT=production
-   PORT=80
-   ```
+4. **Live URL** : `https://yourapp.onrender.com` 🎉
 
-5. **URL automatique** : `https://yourapp.railway.app` 🎉
+### **Configuration Details**
+- **Build Command**: `composer install --no-dev --optimize-autoloader && npm ci && npm run build:prod`
+- **Start Command**: `vendor/bin/heroku-php-apache2 -C apache.conf public/`
+- **Environment**: Production PHP 8.1+
+- **Auto-deploy**: Enabled on git push
 
-### **Guide Détaillé**
-📖 **[DEPLOY-RAILWAY.md](DEPLOY-RAILWAY.md)** - Guide complet step-by-step
-
-## 📋 **Commandes Développement**
+## 📋 **Development Commands**
 
 ```bash
-# 🔧 Développement
-npm run dev        # Serveur Vite HMR (port 5173)
-npm run serve      # Serveur CI4 (port 8080)
-npm run start      # Les deux ensemble (recommandé)
+# 🔧 Development
+npm run dev        # Vite HMR server (port 5173)
+npm run serve      # CI4 server (port 8080)  
+npm run start      # Both together (recommended)
 
-# 🏗️ Build Production
-npm run build      # Build développement
-npm run build:prod # Build production optimisé
-npm run preview    # Preview du build
+# 🏗️ Production Build
+npm run build      # Development build
+npm run build:prod # Production optimized build
+npm run preview    # Preview production build
 
-# 🧪 Tests & Validation
-validate-deploy.bat # Validation complète pré-déploiement
-npm run test:build  # Test build uniquement
+# 🧪 Testing & Validation
+./setup-render-yaml.bat    # Validate Render configuration
+npm run test:build         # Test build process
 
 # 🧹 Maintenance
-npm run clean      # Nettoyer les assets générés
+npm run clean      # Clean generated assets
 ```
 
-## 📁 **Structure Projet**
+## 📁 **Project Structure**
 
 ```
 template/
-├── 🐳 Dockerfile              # Configuration Docker Railway
-├── 🚀 railway.toml            # Configuration Railway
+├── 📝 render.yaml             # Infrastructure as Code config
+├── 🔧 apache.conf             # Optimized Apache configuration
 ├── 📁 app/
-│   ├── Views/layouts/         # Templates CI4 avec Vite
+│   ├── Views/layouts/         # CI4 templates with Vite integration
 │   ├── Controllers/           # Home.php + Test.php
-│   └── Helpers/vite_helper.php # Helper CI4-Vite intelligent
+│   └── Helpers/vite_helper.php # Smart CI4-Vite helper
 ├── 📁 resources/
-│   ├── css/app.css           # Tailwind + composants custom
-│   ├── js/app.js             # Alpine.js centralisé
-│   └── static/               # Assets sources
+│   ├── css/app.css           # Tailwind + custom components
+│   ├── js/app.js             # Alpine.js centralized
+│   └── static/               # Source assets
 ├── 📁 public/
-│   ├── assets/               # 🤖 Généré par Vite (CSS/JS)
-│   ├── .htaccess             # Apache optimisé production
-│   └── index.php             # Point d'entrée CI4
-├── 📁 docker/
-│   └── start.sh              # Script démarrage Railway
-├── 🔧 vite.config.js          # Config Vite optimisée
-├── 🎨 tailwind.config.js      # Couleurs + animations custom
-└── 📚 documentation/          # Guides complets
+│   ├── assets/               # 🤖 Generated by Vite (CSS/JS)
+│   ├── .htaccess             # Production Apache config
+│   └── index.php             # CI4 entry point
+├── 🔧 vite.config.js          # Optimized Vite configuration
+├── 🎨 tailwind.config.js      # Custom colors + animations
+└── 📚 documentation/          # Complete guides
 ```
 
-## 🎨 **Utilisation**
+## 🎨 **Usage Examples**
 
-### **Helper Vite dans les Templates**
+### **Vite Helper in Templates**
 ```php
 <!-- app/Views/layouts/header.php -->
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon App CI4</title>
+    <title>My CI4 App</title>
     
-    <!-- Auto-détection dev/prod avec preload optimisé -->
+    <!-- Auto-detection dev/prod with optimized preloading -->
     <?= vite_assets('resources/js/app.js') ?>
 </head>
 ```
 
-### **Classes Tailwind Personnalisées**
+### **Custom Tailwind Components**
 ```html
-<!-- Composants prêts à l'emploi -->
+<!-- Ready-to-use components -->
 <div class="container-custom">
-    <button class="btn-primary btn-lg">Action Principale</button>
-    <button class="btn-secondary btn-sm">Action Secondaire</button>
-    <nav class="glass">Navigation Moderne</nav>
-    <div class="card">Contenu Card</div>
+    <button class="btn-primary btn-lg">Primary Action</button>
+    <button class="btn-secondary btn-sm">Secondary Action</button>
+    <nav class="glass">Modern Navigation</nav>
+    <div class="card">Content Card</div>
 </div>
 ```
 
-### **Alpine.js Centralisé**
+### **Centralized Alpine.js**
 ```html
-<!-- Dark mode toggle (prêt à l'emploi) -->
+<!-- Dark mode toggle (ready-to-use) -->
 <button @click="window.darkMode.toggle()" 
         x-text="window.darkMode.isDark ? '☀️' : '🌙'">
 </button>
 
-<!-- Navigation mobile -->
+<!-- Mobile navigation -->
 <div x-data="window.navbar()" class="mobile-nav">
     <button @click="toggle()" x-text="isOpen ? '✕' : '☰'"></button>
     <nav x-show="isOpen" x-transition>Menu</nav>
@@ -184,7 +179,7 @@ template/
 
 ## ⚙️ **Configuration**
 
-### **Couleurs Personnalisées**
+### **Custom Colors**
 ```javascript
 // tailwind.config.js
 module.exports = {
@@ -193,11 +188,11 @@ module.exports = {
       colors: {
         primary: {
           50: '#eff6ff',
-          500: '#3b82f6',  // Bleu principal
+          500: '#3b82f6',  // Main blue
           900: '#1e3a8a'
         },
         secondary: {
-          500: '#10b981'   // Vert secondaire
+          500: '#10b981'   // Green secondary
         }
       }
     }
@@ -205,159 +200,158 @@ module.exports = {
 }
 ```
 
-### **Variables d'Environnement**
+### **Environment Variables**
 ```env
 # .env
 CI_ENVIRONMENT=development
 
-# Base URL (auto-détectée en production)
+# Auto-detected base URL
 app.baseURL = 'http://localhost:8080'
 
-# Database (Supabase en production)
+# Database (Supabase in production)
 database.default.hostname = localhost
 database.default.database = ci4_template
 database.default.username = root
 database.default.password = 
 
-# Email (Resend en production)
+# Email (Resend in production)
 email.SMTPHost = 
 email.SMTPUser = 
 email.SMTPPass = 
 ```
 
-## 🔧 **Fonctionnalités Intégrées**
+## 🔧 **Built-in Features**
 
-### **✅ Mode Sombre**
-- Toggle automatique avec persistance localStorage
-- Classes Tailwind `dark:` préconfigurées
-- Transition fluide
+### **✅ Dark Mode**
+- Automatic toggle with localStorage persistence
+- Tailwind `dark:` classes pre-configured
+- Smooth transitions
 
-### **✅ Navigation Responsive**
-- Menu mobile avec animations
-- Hamburger vers X avec transition
-- Alpine.js optimisé
+### **✅ Responsive Navigation**
+- Mobile menu with animations
+- Hamburger to X transition
+- Alpine.js optimized
 
 ### **✅ Performance**
-- CSS/JS minifiés et optimisés
-- Compression Gzip/Deflate
-- Cache navigateur 1 an pour assets
-- Preload des ressources critiques
+- Minified and optimized CSS/JS
+- Gzip/Deflate compression
+- 1-year browser caching for assets
+- Critical resource preloading
 
-### **✅ Sécurité**
-- Headers sécurisé (XSS, clickjacking, etc.)
-- HTTPS forcé en production
-- Protection fichiers système CI4
+### **✅ Security**
+- Security headers (XSS, clickjacking, etc.)
+- HTTPS enforced in production
+- CI4 system files protection
 
-## 🌟 **Stack Gratuit Intégré**
+## 🌟 **Free Stack Integration**
 
-### **🗄️ Base de Données : Supabase**
-- PostgreSQL gratuit 500MB
-- Interface admin graphique
-- API REST auto-générée
+### **🗄️ Database: Supabase**
+- PostgreSQL 500MB free
+- Graphical admin interface
+- Auto-generated REST API
 
-### **📧 Emails : Resend**
-- 3,000 emails/mois gratuit
-- API simple, deliverability excellente
-- Domaine personnalisé gratuit
+### **📧 Emails: Resend**
+- 3,000 emails/month free
+- Simple API, excellent deliverability
+- Free custom domain
 
-### **🌐 Hébergement : Railway**
-- $5 crédit gratuit/mois
-- SSL automatique
-- Git deploy automatique
+### **🌐 Hosting: Render.com**
+- 750h free/month (full month)
+- Automatic SSL
+- Auto-deploy from Git
 
-### **📊 Monitoring : UptimeRobot**
-- 50 monitors gratuits
-- Alertes email/SMS
-- Rapports uptime
+### **📊 Monitoring: UptimeRobot**
+- 50 monitors free
+- Email/SMS alerts
+- Uptime reports
 
 ## 📚 **Documentation**
 
-- **[DEPLOY-RAILWAY.md](DEPLOY-RAILWAY.md)** - Guide déploiement complet
-- **[POST-DEPLOY-GUIDE.md](POST-DEPLOY-GUIDE.md)** - Optimisations post-déploiement
-- **[documentation/](documentation/)** - Guides techniques détaillés
+- **[RENDER-DEPLOY.md](RENDER-DEPLOY.md)** - Complete deployment guide
+- **[POST-DEPLOY-GUIDE.md](POST-DEPLOY-GUIDE.md)** - Post-deployment optimizations
+- **[documentation/](documentation/)** - Detailed technical guides
 
-## 🚀 **Scripts Utiles**
+## 🚀 **Quick Scripts**
 
 ```bash
-# Validation complète avant déploiement
-./validate-deploy.bat
+# Complete validation before deployment
+./setup-render-yaml.bat
 
-# Test de performance local
-npm run start
-# Puis ouvrir : http://localhost:8080
-
-# Build et test production
+# Test production build
 npm run build:prod
 php spark serve --port 8080
+
+# Fix favicon issues (if any)
+./fix-render-favicon.bat
 ```
 
-## 🎯 **Cas d'Usage**
+## 🎯 **Use Cases**
 
-### **🏢 Sites Corporate**
-- Landing pages modernes
-- Portfolios d'entreprise
-- Sites vitrine
+### **🏢 Corporate Sites**
+- Modern landing pages
+- Business portfolios
+- Showcase websites
 
-### **🛍️ Applications Web**
-- Dashboards admin
-- Applications CRUD
-- APIs RESTful
+### **🛍️ Web Applications**
+- Admin dashboards
+- CRUD applications
+- RESTful APIs
 
 ### **🚀 MVPs & Prototypes**
-- Validation d'idées rapide
-- Démos clients
-- Tests utilisateurs
+- Rapid idea validation
+- Client demos
+- User testing
 
-## 💰 **Coûts**
+## 💰 **Costs**
 
-### **Phase Demo/MVP (0€)**
-- Railway : $5 crédit gratuit
-- Supabase : 500MB gratuit
-- Resend : 3,000 emails gratuit
-- Domaine : Sous-domaine Railway gratuit
+### **Demo/MVP Phase (0€)**
+- Render: 750h free credit
+- Supabase: 500MB free
+- Resend: 3,000 emails free
+- Domain: Free .onrender.com subdomain
 
-### **Phase Production (≈ 25€/mois)**
-- Railway Hobby : $20/mois
-- Domaine .com : $12/an
-- Monitoring premium : $5/mois
+### **Production Phase (~25€/month)**
+- Render Starter: $7/month
+- Custom domain: $12/year
+- Premium monitoring: $5/month
 
-## 🤝 **Contribution**
+## 🤝 **Contributing**
 
-Ce template est open-source et maintenu activement. Contributions bienvenues !
+This template is open-source and actively maintained. Contributions welcome!
 
 ```bash
-# Fork le projet
+# Fork the project
 git clone https://github.com/your-username/ci4-tailwind-template.git
 
-# Créer une branch feature
+# Create feature branch
 git checkout -b feature/amazing-feature
 
-# Commit et push
+# Commit and push
 git commit -m "Add amazing feature"
 git push origin feature/amazing-feature
 
-# Créer Pull Request
+# Create Pull Request
 ```
 
-## 📄 **Licence**
+## 📄 **License**
 
-MIT License - Voir [LICENSE](LICENSE) pour plus de détails.
+MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
-## 🎉 **Prêt à Déployer !**
+## 🎉 **Ready to Deploy!**
 
-**✅ Template production-ready en 5 minutes**  
-**✅ Stack moderne et performant**  
-**✅ Coût 0€ pour commencer**  
-**✅ Évolutivité garantie**
+**✅ Production-ready template in 5 minutes**  
+**✅ Modern stack with performance**  
+**✅ Free tier to start**  
+**✅ Scalable infrastructure**
 
-### **Quick Start Railway :**
+### **Quick Deploy to Render:**
 ```bash
 git clone [this-repo]
 cd template
-./validate-deploy.bat
-# → Deploy sur Railway → 🚀 Live !
+./setup-render-yaml.bat
+# → Deploy to Render → 🚀 Live!
 ```
 
-**🌟 Star ce repo si ça vous aide ! 🌟**
+**🌟 Star this repo if it helps you! 🌟**

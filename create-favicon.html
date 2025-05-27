@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Favicon for CI4 Template</title>
+</head>
+<body>
+    <h2>🎯 Favicon Generator - CI4 Template</h2>
+    <canvas id="favicon" width="32" height="32" style="border: 1px solid #ccc; image-rendering: pixelated; width: 128px; height: 128px;"></canvas>
+    <br><br>
+    <button onclick="generateFavicon()">Generate Favicon</button>
+    <button onclick="downloadFavicon()">Download favicon.ico</button>
+    <br><br>
+    <p><strong>Instructions:</strong></p>
+    <ol>
+        <li>Click "Generate Favicon"</li>
+        <li>Click "Download favicon.ico"</li>
+        <li>Save as <code>favicon.ico</code> in your <code>public/</code> folder</li>
+        <li>Commit and push to Render</li>
+    </ol>
+    
+    <script>
+        const canvas = document.getElementById('favicon');
+        const ctx = canvas.getContext('2d');
+        
+        // Helper function for rounded rectangle
+        function roundRect(x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+        
+        function generateFavicon() {
+            // Clear canvas
+            ctx.clearRect(0, 0, 32, 32);
+            
+            // Background with rounded corners
+            roundRect(2, 2, 28, 28, 4);
+            ctx.fillStyle = '#3B82F6'; // Tailwind blue-500
+            ctx.fill();
+            
+            // Add a subtle border
+            ctx.strokeStyle = '#1E40AF'; // Tailwind blue-700
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            
+            // Text "CI" - centered and bold
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('CI', 16, 16);
+            
+            console.log('✅ Favicon generated successfully!');
+        }
+        
+        function downloadFavicon() {
+            // Create a temporary link and download
+            canvas.toBlob(function(blob) {
+                const link = document.createElement('a');
+                link.download = 'favicon.ico';
+                link.href = URL.createObjectURL(blob);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                console.log('✅ Favicon downloaded as favicon.ico');
+                alert('✅ Favicon downloaded! Save it as favicon.ico in your public/ folder.');
+            }, 'image/png'); // PNG format works for favicon
+        }
+        
+        // Auto-generate on page load
+        window.onload = function() {
+            generateFavicon();
+        };
+    </script>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background: #2563EB;
+        }
+        
+        code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+    </style>
+</body>
+</html>
