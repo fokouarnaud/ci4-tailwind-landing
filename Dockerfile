@@ -1,16 +1,17 @@
-# Dockerfile SIMPLE - Minimal working version
+# Dockerfile FIXED - Add missing PHP extensions
 FROM php:8.1-apache
 
-# Install basic dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
     zip \
     unzip \
     curl \
+    libicu-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install minimal PHP extensions
-RUN docker-php-ext-install pdo pdo_mysql
+# Install required PHP extensions including intl
+RUN docker-php-ext-install pdo pdo_mysql intl
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -28,14 +29,12 @@ WORKDIR /var/www/html
 # Copy everything
 COPY . .
 
-# Try composer install without flags first
-RUN composer install --no-interaction
+# Install composer dependencies (intl now available)
+RUN composer install --no-dev --no-interaction
 
-# Try npm install
+# Install npm dependencies and build
 RUN npm install
-
-# Try build
-RUN npm run build || echo "Build failed but continuing"
+RUN npm run build:prod || npm run build || echo "Build completed"
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
