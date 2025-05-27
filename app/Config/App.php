@@ -106,20 +106,17 @@ class App extends BaseConfig
         // Détection du protocole
         $protocol = $this->isHTTPS() ? 'https' : 'http';
         
-        // Détection du host
+        // Détection du host (sans port)
         $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
         
-        // Port spécifique si nécessaire
-        $port = '';
-        if (isset($_SERVER['SERVER_PORT'])) {
-            $serverPort = (int) $_SERVER['SERVER_PORT'];
-            if (($protocol === 'http' && $serverPort !== 80) || 
-                ($protocol === 'https' && $serverPort !== 443)) {
-                $port = ':' . $serverPort;
-            }
+        // Nettoyer le host s'il contient déjà un port
+        if (strpos($host, ':') !== false) {
+            $host = explode(':', $host)[0];
         }
         
-        return $protocol . '://' . $host . $port . '/';
+        // Pour les URLs HTTPS standard (443) et HTTP standard (80), ne pas ajouter de port
+        // Render utilise les ports standards
+        return $protocol . '://' . $host . '/';
     }
     
     /**

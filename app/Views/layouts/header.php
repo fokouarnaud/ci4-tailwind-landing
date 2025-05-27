@@ -12,8 +12,11 @@
     <!-- Assets Vite (CSS + JS) -->
     <?= vite_assets('resources/js/app.js') ?>
     
-    <!-- Alpine.js Components -->
-    <?= load_alpine_components() ?>
+    <!-- Alpine.js Functions (Inline) -->
+    <?= load_alpine_inline() ?>
+    
+    <!-- Debug URLs -->
+    <?= debug_current_urls() ?>
     
     <!-- Theme Setup -->
     <script>
