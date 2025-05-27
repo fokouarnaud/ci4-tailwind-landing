@@ -1,0 +1,73 @@
+# Dockerfile No-Build - Assets déjà buildés localement
+# Utilisez cette version si vous buildez localement avant le deploy
+
+FROM php:8.1-apache
+
+# Variables d'environnement
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+ENV CI_ENVIRONMENT=production
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Installation des dépendances système
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    libpq-dev \
+    zip \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Installation des extensions PHP
+RUN docker-php-ext-configure gd \
+    && docker-php-ext-install \
+        pdo \
+        pdo_mysql \
+        pdo_pgsql \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        gd \
+        zip \
+        intl
+
+# Installation de Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Configuration Apache pour CodeIgniter 4
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Activation des modules Apache
+RUN a2enmod rewrite headers env
+
+# Répertoire de travail
+WORKDIR /var/www/html
+
+# Copie de tout le code source (avec assets déjà buildés)
+COPY . .
+
+# Installation des dépendances PHP uniquement
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+# Configuration des permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 777 /var/www/html/writable
+
+# Configuration Apache simple
+RUN echo '<Directory ${APACHE_DOCUMENT_ROOT}>\n\
+    Options -Indexes +FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>' > /etc/apache2/sites-available/000-default.conf
+
+# Exposition du port
+EXPOSE 80
+
+# Commande de démarrage
+CMD ["apache2-foreground"]

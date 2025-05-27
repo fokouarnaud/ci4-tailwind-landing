@@ -1,0 +1,87 @@
+# Alternative Dockerfile - Plus Simple pour Railway
+FROM node:18-alpine AS builder
+
+# Installation des dépendances pour le build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+
+# Copie du code source et build
+COPY . .
+RUN npm run build:prod
+
+# Image de production PHP
+FROM php:8.1-apache
+
+# Variables d'environnement
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+ENV CI_ENVIRONMENT=production
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Installation des dépendances système
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    libpq-dev \
+    zip \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Installation des extensions PHP
+RUN docker-php-ext-configure gd \
+    && docker-php-ext-install \
+        pdo \
+        pdo_mysql \
+        pdo_pgsql \
+        mbstring \
+        exif \
+        pcntl \
+        bcmath \
+        gd \
+        zip \
+        intl
+
+# Installation de Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Configuration Apache pour CodeIgniter 4
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Activation des modules Apache
+RUN a2enmod rewrite headers env deflate expires
+
+# Répertoire de travail
+WORKDIR /var/www/html
+
+# Copie du code source (sans node_modules)
+COPY . .
+COPY --from=builder /app/public/assets ./public/assets
+
+# Installation des dépendances PHP uniquement
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+# Configuration des permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html \
+    && chmod -R 777 /var/www/html/writable
+
+# Configuration Apache optimisée
+RUN echo '<Directory ${APACHE_DOCUMENT_ROOT}>\n\
+    Options -Indexes +FollowSymLinks\n\
+    AllowOverride All\n\
+    Require all granted\n\
+    Header always set X-Content-Type-Options nosniff\n\
+    Header always set X-Frame-Options DENY\n\
+    Header always set X-XSS-Protection "1; mode=block"\n\
+</Directory>' > /etc/apache2/sites-available/000-default.conf
+
+# Exposition du port
+EXPOSE 80
+
+# Commande de démarrage simple
+CMD ["apache2-foreground"]
