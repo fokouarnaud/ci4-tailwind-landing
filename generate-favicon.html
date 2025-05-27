@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Favicon.ico</title>
+</head>
+<body>
+    <h2>Favicon Generator for CI4 Template</h2>
+    <canvas id="canvas" width="32" height="32" style="border: 1px solid #ccc; width: 128px; height: 128px;"></canvas>
+    <br><br>
+    <button onclick="generateFavicon()">Generate Favicon</button>
+    <button onclick="downloadFavicon()">Download favicon.ico</button>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        function generateFavicon() {
+            // Clear canvas
+            ctx.clearRect(0, 0, 32, 32);
+            
+            // Background
+            ctx.fillStyle = '#3B82F6'; // Tailwind blue-500
+            ctx.roundRect(0, 0, 32, 32, 6);
+            ctx.fill();
+            
+            // Text "CI"
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('CI', 16, 16);
+            
+            console.log('Favicon generated!');
+        }
+        
+        function downloadFavicon() {
+            // Convert canvas to ICO format (simplified as PNG)
+            canvas.toBlob(function(blob) {
+                const link = document.createElement('a');
+                link.download = 'favicon.ico';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+            }, 'image/png');
+        }
+        
+        // Auto-generate on load
+        generateFavicon();
+    </script>
+</body>
+</html>
