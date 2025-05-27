@@ -10,14 +10,35 @@ set "ERROR_COUNT=0"
 echo [1/4] 🏗️ Build local des assets...
 echo.
 
-:: Build production local
+:: Installation de cross-env si nécessaire
+echo Vérification de cross-env...
+npm list cross-env >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Installation de cross-env...
+    npm install --save-dev cross-env
+)
+
+:: Build production local avec fallback
+echo Tentative build:prod avec cross-env...
 call npm run build:prod
 if %errorlevel% equ 0 (
     echo ✅ Build production local - OK
 ) else (
-    echo ❌ Build production local - ERREUR
-    set /a ERROR_COUNT+=1
-    goto :error
+    echo ⚠️ Build:prod échoué, tentative build:prod:simple...
+    call npm run build:prod:simple
+    if %errorlevel% equ 0 (
+        echo ✅ Build production simple - OK
+    ) else (
+        echo ⚠️ Build simple échoué, tentative build standard...
+        call npm run build
+        if %errorlevel% equ 0 (
+            echo ✅ Build standard - OK
+        ) else (
+            echo ❌ Tous les builds ont échoué
+            set /a ERROR_COUNT+=1
+            goto :error
+        )
+    )
 )
 
 :: Verification des assets generes

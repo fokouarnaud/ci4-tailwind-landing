@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "vite --host localhost --port 5173",
     "build": "vite build",
-    "build:prod": "NODE_ENV=production vite build",
+    "build:prod": "cross-env NODE_ENV=production vite build",
+    "build:prod:simple": "vite build --mode production",
     "preview": "vite preview",
     "watch": "vite build --watch",
     "clean": "rimraf public/assets/*",
@@ -25,6 +26,7 @@
     "@tailwindcss/typography": "^0.5.10",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
     "postcss": "^8.4.31",
     "prettier": "^3.1.1",
     "prettier-plugin-tailwindcss": "^0.5.9",
