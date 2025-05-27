@@ -1,0 +1,36 @@
+{
+  "name": "ci4-tailwind-template",
+  "version": "1.0.0",
+  "description": "CodeIgniter 4 project with Tailwind CSS and modern frontend tooling",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:prod": "NODE_ENV=production vite build",
+    "preview": "vite preview",
+    "watch": "vite build --watch",
+    "clean": "rimraf public/assets/*",
+    "lint:css": "stylelint resources/css/**/*.css",
+    "format:css": "prettier --write resources/css/**/*.css",
+    "serve": "php spark serve",
+    "start": "concurrently \"npm run dev\" \"npm run serve\""
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.4.31",
+    "prettier": "^3.1.1",
+    "prettier-plugin-tailwindcss": "^0.5.9",
+    "rimraf": "^5.0.5",
+    "stylelint": "^16.1.0",
+    "stylelint-config-standard": "^36.0.0",
+    "tailwindcss": "^3.4.0",
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "alpinejs": "^3.13.3"
+  }
+}

@@ -1,0 +1,2 @@
+// Main application JavaScript file
+import Alpine from 'alpinejs';\nimport './components/darkMode';\nimport './components/navbar';\nimport './utils/animations';\n\n// Make Alpine available globally\nwindow.Alpine = Alpine;\n\n// Initialize Alpine\nAlpine.start();\n\nconsole.log('🚀 CI4 Tailwind Template loaded successfully!');

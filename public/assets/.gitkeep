@@ -1,0 +1,2 @@
+# This file ensures the assets directory is tracked by Git
+# Built assets will be generated here during build process
