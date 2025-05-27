@@ -1,72 +1,96 @@
-# CodeIgniter 4 Application Starter
+# 🚀 CI4 Tailwind Template
 
-## What is CodeIgniter?
+Template CodeIgniter 4 moderne avec Tailwind CSS v3, Vite et Alpine.js.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+## 🛠️ Stack
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+- **CodeIgniter 4.6+**
+- **Tailwind CSS v3.4.1** avec plugins Forms & Typography
+- **Vite 5** pour le bundling et HMR
+- **Alpine.js 3.13** pour l'interactivité
+- **PHP 8.2+** et **Node.js 18+**
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
+## 🚀 Installation
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+```bash
+# Installation des dépendances
+composer install
+npm install
 
-## Installation & updates
+# Configuration
+cp env .env
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+# Premier build
+npm run build
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
+# Démarrage
+npm run start
+```
 
-## Setup
+## 📋 Commandes
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+```bash
+# Développement
+npm run dev        # Serveur Vite (port 5173)
+npm run serve      # Serveur CI4 (port 8080)  
+npm run start      # Les deux ensemble
 
-## Important Change with index.php
+# Build
+npm run build      # Build développement
+npm run build:prod # Build production
+npm run preview    # Preview du build
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+# Maintenance
+npm run clean      # Nettoyer les assets
+```
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+## 📁 Structure
 
-**Please** read the user guide for a better explanation of how CI4 works!
+```
+template/
+├── app/Views/layouts/     # Templates CI4
+├── resources/
+│   ├── css/app.css       # Tailwind CSS
+│   ├── js/app.js         # Entry point Alpine.js
+│   └── static/           # Assets statiques
+├── public/assets/        # 🤖 Généré par Vite
+├── vite.config.js        # Configuration Vite
+├── tailwind.config.js    # Configuration Tailwind
+└── package.json          # Dépendances npm
+```
 
-## Repository Management
+## 🎨 Utilisation
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+### **Helper Vite dans les templates :**
+```php
+<!-- Dans header.php -->
+<?= vite('resources/js/app.js') ?>
+```
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+### **Classes Tailwind personnalisées :**
+```html
+<div class="container-custom">
+  <button class="btn-primary btn-sm">Action</button>
+  <nav class="glass">Navigation</nav>
+</div>
+```
 
-## Server Requirements
+### **Alpine.js pour l'interactivité :**
+```html
+<div x-data="{ open: false }">
+  <button @click="open = !open">Toggle</button>
+  <div x-show="open">Contenu</div>
+</div>
+```
 
-PHP version 8.1 or higher is required, with the following extensions installed:
+## ⚙️ Configuration
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+- **Tailwind** : Couleurs `primary` et `secondary` personnalisées
+- **Fonts** : Inter (display et body), JetBrains Mono
+- **Mode sombre** : Classe `dark` avec Alpine.js
+- **Responsive** : Breakpoints Tailwind standard
+- **Plugins** : Forms et Typography inclus
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - If you are still using PHP 7.4 or 8.0, you should upgrade immediately.
-> - The end of life date for PHP 8.1 will be December 31, 2025.
+---
 
-Additionally, make sure that the following extensions are enabled in your PHP:
-
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
-# website-ci4-it-innov
-# website-ci4-it-innov
-# ci4-tailwind-landing
-# ci4-tailwind-landing
+**🎯 Prêt pour le développement !**

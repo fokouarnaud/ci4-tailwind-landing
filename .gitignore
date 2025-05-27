@@ -1,4 +1,38 @@
 #-------------------------
+# Temporary and deleted files
+#-------------------------
+temp_deleted_files/
+__temp_delete__/
+_deleted/
+*.bak
+*.tmp
+*.temp
+
+#-------------------------
+# Tailwind CSS v4 & Migration Files
+#-------------------------
+
+# Migration backups
+*.backup
+*.v3.backup
+tailwind.config.js.backup
+postcss.config.js.backup
+resources/css/app.css.v3.backup
+
+# Tailwind v4 doesn't use these files anymore
+tailwind.config.js
+postcss.config.js
+
+# Vite cache (v4 specific)
+.vite/
+node_modules/.vite/
+
+# Test files
+test_*.bat
+test_*.sh
+diagnostic.*
+
+#-------------------------
 # Operating Specific Junk Files
 #-------------------------
 
@@ -72,8 +106,9 @@ yarn-error.log*
 # Build outputs
 /public/assets/*
 !/public/assets/.gitkeep
-/public/build/
-/dist/
+
+# Never put manual files in assets/ - use resources/static/ instead
+!/public/assets/README.md
 
 # Hot reload
 .vite/
@@ -147,6 +182,29 @@ user_guide_src/build/*
 user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*
 user_guide_src/cilexer/pycilexer.egg-info/*
+
+#-------------------------
+# Cleanup & Temporary
+#-------------------------
+# Files marked for deletion
+_TO_DELETE_*
+cleanup.sh
+cleanup.bat
+
+# Installation scripts (uncomment after first install)
+# install.sh
+# install.bat
+
+# Duplicate files
+builds
+env
+
+# Malformed directory names
+appLanguage*
+appViews*
+publicbuild*
+publicimages*
+resourcescss
 
 #-------------------------
 # Miscellaneous

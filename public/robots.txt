@@ -1,2 +1,30 @@
+# robots.txt for CI4 Tailwind Template
+# https://www.robotstxt.org/
+
 User-agent: *
-Disallow: 
+Allow: /
+
+# Block access to system directories
+Disallow: /app/
+Disallow: /system/
+Disallow: /vendor/
+Disallow: /writable/
+Disallow: /tests/
+
+# Block access to configuration files
+Disallow: /.env
+Disallow: /composer.json
+Disallow: /composer.lock
+Disallow: /package.json
+Disallow: /package-lock.json
+
+# Allow access to public assets
+Allow: /assets/
+Allow: /images/
+Allow: /favicon.ico
+Allow: /robots.txt
+Allow: /sitemap.xml
+Allow: /manifest.json
+
+# Sitemap location
+Sitemap: https://yourdomain.com/sitemap.xml

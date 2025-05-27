@@ -1,0 +1,1 @@
+# Images pour le site\n# Ces images seront copiées et optimisées par Vite vers public/assets/images/\n# Utilisées dans le code (logos, heroes, icons, illustrations)\n\n# Exemples :\n# logo.png -> public/assets/images/logo.[hash].png\n# hero.jpg -> public/assets/images/hero.[hash].jpg

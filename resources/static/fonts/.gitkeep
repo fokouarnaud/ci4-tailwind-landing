@@ -1,0 +1,1 @@
+# Fonts personnalisées\n# Ces fonts seront copiées par Vite vers public/assets/fonts/\n# Format recommandé : .woff2 pour les performances\n\n# Exemples :\n# custom-font.woff2 -> public/assets/fonts/custom-font.[hash].woff2\n# icons.woff -> public/assets/fonts/icons.[hash].woff
