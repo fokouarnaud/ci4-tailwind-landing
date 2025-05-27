@@ -1,0 +1,64 @@
+# Docker ignore - Optimisation build
+# Ne pas inclure ces fichiers dans l'image Docker
+
+# Git
+.git/
+.gitignore
+*.md
+
+# Documentation
+documentation/
+FINALISATION.md
+
+# Scripts de développement
+*.bat
+test-config.bat
+cleanup.bat
+check-cleanup.bat
+
+# Environnement de développement
+.env.example
+.vscode/
+.idea/
+
+# Logs et caches
+*.log
+writable/logs/*
+!writable/logs/.gitkeep
+
+# Node modules (sera installé dans Docker)
+node_modules/
+npm-debug.log*
+
+# Vendor (sera installé dans Docker)
+vendor/
+
+# Build temporaires
+public/assets/*
+!public/assets/.gitkeep
+
+# Tests
+tests/
+phpunit.xml.dist
+.phpunit.result.cache
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+*.swp
+*.swo
+*~
+
+# Screenshots temporaires
+*.png
+reference-*.png
+
+# Backups
+*.backup
+*.bak
+*.tmp
+
+# Hot reloads Vite
+public/hot
